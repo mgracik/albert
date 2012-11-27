@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2012 Martin Gracik
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+# Author(s): Martin Gracik <martin@gracik.me>
+#
+
+import argparse
+import logging
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger('albert')
+
+from twisted.internet import reactor
+
+from albert import AlbertIRCClientFactory
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--server', default='irc.freenode.net')
+    parser.add_argument('-p', '--port', default=6667)
+    parser.add_argument('-c', '--channel')
+    parser.add_argument('-n', '--nickname', default='a1bert')
+    parser.add_argument('-o', '--owner')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False)
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    if args.verbose:
+        log.setLevel(logging.DEBUG)
+
+    albert_irc = AlbertIRCClientFactory(args.channel, args.nickname, args.owner)
+    reactor.connectTCP(args.server, args.port, albert_irc)
+    reactor.run()
